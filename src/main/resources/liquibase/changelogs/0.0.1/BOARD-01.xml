@@ -1,0 +1,34 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet id="create_board_table" author="carolmoya">
+		<createTable tableName="board">
+			<column name="id" type="java.sql.Types.BIGINT" autoIncrement="true">
+	        	<constraints primaryKey="true" nullable="false" />
+	        </column>
+			<column name="name" type="java.sql.Types.VARCHAR(100)">
+				<constraints unique="true" nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="create_post_table" author="carolmoya">
+		<createTable tableName="post">
+			<column name="id" type="java.sql.Types.BIGINT" autoIncrement="true">
+	        	<constraints primaryKey="true" nullable="false" />
+	        </column>
+			<column name="text" type="java.sql.Types.VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="board_id" type="java.sql.Types.BIGINT" />
+		</createTable>
+		
+		<addForeignKeyConstraint constraintName="fk_post_board_id" referencedTableName="board" 
+		baseColumnNames="board_id" baseTableName="post" referencedColumnNames="id"/>
+	</changeSet>
+	
+</databaseChangeLog>

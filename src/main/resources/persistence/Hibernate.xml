@@ -12,9 +12,12 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
       <ref bean="dataSource"/>
     </property>
  
+ 	<property name="packagesToScan" value="com.aweshome.dailyBoard.model" />
+ 	
     <property name="hibernateProperties">
        <props>
            <prop key="hibernate.dialect">${db.dialect}</prop>
+           <prop key="hibernate.show_sql">true</prop>
        </props>
      </property>
  

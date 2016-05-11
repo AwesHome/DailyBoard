@@ -10,11 +10,12 @@
   http://www.springframework.org/schema/aop
   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
-	<context:component-scan base-package="com.sage.cerberus" />
-
 	<import resource="../persistence/DataSource.xml" />
 	<import resource="../persistence/Hibernate.xml" />
-	<import resource="./aop-config.xml" />
+
+	<tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
+
+    <context:component-scan base-package="com.aweshome.dailyBoard" />
 
 	<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
 		<property name="dataSource" ref="dataSource" />

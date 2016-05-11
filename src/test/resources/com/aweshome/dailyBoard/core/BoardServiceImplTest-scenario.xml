@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<board id = "1" name = "Main Board"/>
+	
+	<post id = "1" text = "first post content" board_id = "1"/>
+	<post id = "2" text = "second post content" board_id = "1"/>
+</dataset>
