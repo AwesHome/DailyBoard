@@ -6,8 +6,7 @@ public class PostDTOBuilder implements Builder<Post, PostDTO> {
 
 	@Override
 	public PostDTO buildDTO(Post input) {
-		PostDTO postDTO = new PostDTO();
-		postDTO.setContent(input.getContent());
+		PostDTO postDTO = new PostDTO(input.getContent());
 		return postDTO ;
 	}
 

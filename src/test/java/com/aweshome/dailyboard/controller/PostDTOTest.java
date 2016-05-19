@@ -20,7 +20,7 @@ public class PostDTOTest {
 		PostDTO b = new PostDTO("data");
 		PostDTO c = new PostDTO("data");
 		PostDTO differentContent = new PostDTO("different data");
-		PostDTO nullContent = new PostDTO();
+		PostDTO nullContent = new PostDTO(null);
 		Post post = new Post("data");
 		
 		Assert.assertEquals(a, b);

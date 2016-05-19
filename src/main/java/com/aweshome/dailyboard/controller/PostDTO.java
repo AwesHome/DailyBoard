@@ -8,10 +8,6 @@ public class PostDTO {
 		 this.content = content;
 	}
 
-	public PostDTO() {
-		super();
-	}
-
 	public void setContent(String content) {
 		this.content = content;
 	}
