@@ -4,6 +4,14 @@ public class PostDTO {
 	
 	private String content;
 	
+	public PostDTO(String content) {
+		 this.content = content;
+	}
+
+	public PostDTO() {
+		super();
+	}
+
 	public void setContent(String content) {
 		this.content = content;
 	}

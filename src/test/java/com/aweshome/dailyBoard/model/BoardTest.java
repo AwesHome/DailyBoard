@@ -3,57 +3,41 @@ package com.aweshome.dailyBoard.model;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.aweshome.dailyBoard.EqualsVerifier;
+import com.aweshome.dailyBoard.TestSetUpUtils;
+import com.aweshome.dailyBoard.controller.BoardDTO;
+
+import jersey.repackaged.com.google.common.collect.Lists;
+
 
 public class BoardTest {
 	
 	@Test
 	public void equalsTest() {
-		Board a = this.getBoardWithoutId();
-		Board b = this.getBoardWithoutId();
-		Board c = this.getBoardWithoutId();
+		EqualsVerifier<Board> equalsTester = new EqualsVerifier<Board>();
 		
-		this.equalsReflexibilityTest(a);
-		this.equalsSymmetryTest(a, b);
-		this.equalsTransitivityTest(a, b, c);
+		Board a = TestSetUpUtils.getBoard(1L, "relevant information", "new information", "reminder");
+		Board b = TestSetUpUtils.getBoard(1L, "relevant information", "new information", "reminder");
+		Board c = TestSetUpUtils.getBoard(1L, "relevant information", "new information", "reminder");
 		
-		a = this.getBoardWithId();
-		b = this.getBoardWithId();
-		c = this.getBoardWithId();
+		Board differentId = TestSetUpUtils.getBoard(55L, "relevant information", "new information", "reminder");
+		Board nullId = TestSetUpUtils.getBoard(null, "relevant information", "new information", "reminder");
+		Board differentName = TestSetUpUtils.getBoard(1L, "today", "new information", "reminder");
+		Board nullName = TestSetUpUtils.getBoard(1L, null, "new information", "reminder");
+		Board differentPosts = TestSetUpUtils.getBoard(1L, "relevant information", "new information");
+		BoardDTO boardDTO = TestSetUpUtils.getBoardDTO(1L, "relevant information", "new information", "reminder");
 		
-		this.equalsReflexibilityTest(a);
-		this.equalsSymmetryTest(a, b);
-		this.equalsTransitivityTest(a, b, c);
-	}
-	
-	public void equalsReflexibilityTest(Board a) {
-		Assert.assertEquals(a, a);
-	}
-	
-	public void equalsSymmetryTest(Board a, Board b) {
+		Assert.assertNotEquals(a, null);
 		Assert.assertEquals(a, b);
-		Assert.assertEquals(b, a);
-	}
-	
-	public void equalsTransitivityTest(Board a, Board b, Board c) {
-		Assert.assertEquals(a, b);
-		Assert.assertEquals(b, c);
-		Assert.assertEquals(a, c);
-	}
-	
-	public Board getBoardWithoutId() {
-		Board board = new Board();
-		board.setName("relevant information");
-		board.addPost(new Post("new information"));
-		board.addPost(new Post("reminder"));
-		return board;
-	}
-	
-	public Board getBoardWithId() {
-		Board board = new Board();
-		board.setId(55L);
-		board.setName("today");
-		return board;
+		Assert.assertNotEquals(a, differentId);
+		Assert.assertNotEquals(a, nullId);
+		Assert.assertNotEquals(a, differentName);
+		Assert.assertNotEquals(a, nullName);
+		Assert.assertNotEquals(a, differentPosts);
+		Assert.assertNotEquals(a, boardDTO);
 		
+		equalsTester.assertEqualsProperties(a, b, c, Lists.newArrayList(differentId, nullId, differentName, nullName, differentPosts));
 	}
+	
 	
 }

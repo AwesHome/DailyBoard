@@ -23,8 +23,7 @@ public class PostDTOBuilderTest {
 	@Test
 	public void buildEntity() {
 		String content = "post content area";
-		PostDTO postDTO = new PostDTO();
-		postDTO.setContent(content);
+		PostDTO postDTO = new PostDTO(content);
 		Post post = target.buildEntity(postDTO);
 		Assert.assertEquals(content, post.getContent());
 	}

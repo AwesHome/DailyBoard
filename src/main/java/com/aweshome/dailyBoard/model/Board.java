@@ -78,11 +78,7 @@ public class Board {
 		} else if (!name.equals(other.name)) {
 			return false;
 		}
-		if (posts == null) {
-			if (other.posts != null) {
-				return false;
-			}
-		} else if (!posts.equals(other.posts)) {
+		if (!posts.equals(other.posts)) {
 			return false;
 		}
 		return true;

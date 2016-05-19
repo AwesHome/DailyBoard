@@ -4,15 +4,14 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import com.aweshome.dailyBoard.TestSetUpUtils;
 import com.aweshome.dailyBoard.controller.BoardDTO;
 import com.aweshome.dailyBoard.controller.BoardDTOBuilder;
 import com.aweshome.dailyBoard.controller.Builder;
 import com.aweshome.dailyBoard.controller.BuilderFactory;
-import com.aweshome.dailyBoard.controller.PostDTO;
 import com.aweshome.dailyBoard.controller.resources.BoardResource;
 import com.aweshome.dailyBoard.core.BoardService;
 import com.aweshome.dailyBoard.model.Board;
-import com.aweshome.dailyBoard.model.Post;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,17 +25,8 @@ public class BoardResourceTest {
 	
 	@Test
 	public void getBoard() {
-		Board boardReturnedBySearch = new Board();
-		boardReturnedBySearch.setId(1L);
-		boardReturnedBySearch.setName("main board");
-		boardReturnedBySearch.addPost(new Post("most important post"));
-		
-		BoardDTO expectedResult = new BoardDTO();
-		expectedResult.setId(1L);
-		expectedResult.setName("main board DTO");
-		PostDTO postDTO = new PostDTO();
-		postDTO.setContent("most important post DTO");
-		expectedResult.addPost(postDTO);
+		Board boardReturnedBySearch = TestSetUpUtils.getBoard(1L, "main board", "most important post");
+		BoardDTO expectedResult = TestSetUpUtils.getBoardDTO(1L, "main board", "most important post");
 		
 		Builder<Board, BoardDTO> builder = mock(BoardDTOBuilder.class);
 		BuilderFactory builderFactory = mock(BuilderFactory.class);
@@ -60,17 +50,8 @@ public class BoardResourceTest {
 	
 	@Test
 	public void createBoard() {
-		String name = "Main Board DTO";
-		BoardDTO boardDTOToBeCreated = new BoardDTO();
-		boardDTOToBeCreated.setName(name);
-		PostDTO postDTO = new PostDTO();
-		postDTO.setContent("post content DTO");
-		boardDTOToBeCreated.addPost(postDTO);
-		
-		Board boardBuilt = new Board();
-		boardBuilt.setId(1L);
-		boardBuilt.setName("Main board");
-		boardBuilt.addPost(new Post("post content"));
+		BoardDTO boardDTOToBeCreated = TestSetUpUtils.getBoardDTO(null, "Main Board", "post content");
+		Board boardBuilt = TestSetUpUtils.getBoard(1L, "Main Board", "post content");
 		
 		Builder<Board, BoardDTO> boardDTOBuilder = mock(BoardDTOBuilder.class);
 		BuilderFactory builderFactory = mock(BuilderFactory.class);

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.* ;
 
+import com.aweshome.dailyBoard.TestSetUpUtils;
 import com.aweshome.dailyBoard.controller.BoardDTO;
 import com.aweshome.dailyBoard.controller.BoardDTOBuilder;
 import com.aweshome.dailyBoard.controller.PostDTOBuilder;
@@ -27,11 +28,7 @@ public class BoardDTOBuilderTest {
 	
 	@Test
 	public void buildDTO() {
-		Board board = new Board();
-		board.setId(1L);
-		board.setName("test board");
-		board.addPost(new Post("post with content"));
-		board.addPost(new Post("second post"));
+		Board board = TestSetUpUtils.getBoard(1L, "test board", "post with content", "second post");
 		
 		BoardDTO boardDTO = target.buildDTO(board);
 		
@@ -39,20 +36,12 @@ public class BoardDTOBuilderTest {
 		assertEquals(board.getName(), boardDTO.getName());
 		assertEquals(board.getId(), boardDTO.getId());
 		assertNotNull(boardDTO.getPosts());
-		assertEquals(board.getPosts().size(), boardDTO.getPosts().size()); // post content is validated in the PostDTOBuilderTest
+		assertEquals(board.getPosts().size(), boardDTO.getPosts().size());
 	}
 	
 	@Test
 	public void buildEntity() {
-		BoardDTO boardDTO = new BoardDTO();
-		boardDTO.setId(1L);
-		boardDTO.setName("test board");
-		PostDTO post1 = new PostDTO();
-		PostDTO post2 = new PostDTO();
-		post1.setContent("post with content");
-		post2.setContent("second post");
-		boardDTO.addPost(post1);
-		boardDTO.addPost(post2);
+		BoardDTO boardDTO = TestSetUpUtils.getBoardDTO(1L, "test board", "post with content", "second post");
 		
 		Board board = target.buildEntity(boardDTO);
 		

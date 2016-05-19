@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
+import com.aweshome.dailyBoard.TestSetUpUtils;
 import com.aweshome.dailyBoard.model.Board;
 import com.aweshome.dailyBoard.model.Post;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
@@ -41,8 +42,7 @@ public class BoardServiceImplTest {
 	
 	@Test
 	public void createBoardTest() {
-		Board board = new Board();
-		board.setName("Board being saved");
+		Board board = TestSetUpUtils.getBoard(null, "Board being saved");
 		
 		Board savedBoard = target.createBoard(board);
 		

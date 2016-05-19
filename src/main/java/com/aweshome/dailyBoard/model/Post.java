@@ -54,7 +54,11 @@ public class Post {
 			return false;
 		}
 		Post other = (Post) obj;
-		if (!content.equals(other.content)) {
+		if (content == null) {
+			if (other.content != null) {
+				return false;
+			}
+		} else if (!content.equals(other.content)) {
 			return false;
 		}
 		if (id == null) {
