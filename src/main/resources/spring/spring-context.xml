@@ -15,7 +15,7 @@
 
 	<tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
 
-    <context:component-scan base-package="com.aweshome.dailyBoard" />
+    <context:component-scan base-package="com.aweshome.dailyboard" />
 
 	<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
 		<property name="dataSource" ref="dataSource" />
