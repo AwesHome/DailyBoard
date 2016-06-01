@@ -1,7 +1,7 @@
 package com.aweshome.dailyboard.core;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -25,11 +25,11 @@ public class BoardServiceImpl implements BoardService{
 	
 	@Override
 	public Optional<Board> findBoard(Long id) {
-		Board board = (Board) sessionFactory.getCurrentSession()
+		return Optional.ofNullable(
+				(Board) sessionFactory.getCurrentSession()
 				.createCriteria(Board.class)
 				.add(Restrictions.idEq(id))
-				.uniqueResult();
-		return Optional.ofNullable(board);
+				.uniqueResult());
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class BoardServiceImpl implements BoardService{
 		}
 	}
 
-	private String buildMessageForException(Set<String> issues) {
+	private String buildMessageForException(Collection<String> issues) {
 		String message = String.join(", ", issues);
 		return message;
 	}

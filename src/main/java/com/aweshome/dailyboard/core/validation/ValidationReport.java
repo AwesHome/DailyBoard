@@ -24,9 +24,7 @@ public class ValidationReport {
 	}
 	
 	public ValidationReport merge(ValidationReport otherReport) {
-		for (String issue : otherReport.getIssues()) {
-			this.addIssue(issue);
-		}
+		this.issues.addAll(otherReport.getIssues());
 		return this;
 	}
 

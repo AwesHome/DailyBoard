@@ -25,13 +25,12 @@ public class BoardResourceTest {
 	
 	private BoardResource target = new BoardResource();
 	private Builder<Board, BoardDTO> boardDTOBuilder;
-	private BuilderFactory builderFactory;
 	private BoardService boardService;
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		boardDTOBuilder = mock(BoardDTOBuilder.class);
-		builderFactory = mock(BuilderFactory.class);
+		BuilderFactory builderFactory = mock(BuilderFactory.class);
 		boardService = mock(BoardService.class);
 		when(builderFactory.<Board, BoardDTO>getBuilder(Board.class)).thenReturn(boardDTOBuilder);
 		when(boardDTOBuilder.buildEntityFrom(any(BoardDTO.class))).thenReturn(new Board());

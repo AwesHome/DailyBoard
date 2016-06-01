@@ -33,32 +33,32 @@ public class BoardValidatorTest {
 	@Test
 	public void validateNullBoard(){
 		ValidationReport report = target.validateBoardToBeCreated(null);	
-		this.assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("No board has been received"));
+		assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("No board has been received"));
 	}
 	
 	@Test
 	public void validateBoardWithNullName() {
 		ValidationReport report = target.validateBoardToBeCreated(TestSetUpUtils.getBoard(null, null));
-		this.assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("Board name has to be specified"));
+		assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("Board name has to be specified"));
 	}
 	
 	@Test
 	public void validateBoardWithEmptyName(){
 		ValidationReport report = target.validateBoardToBeCreated(TestSetUpUtils.getBoard(null, ""));
-		this.assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("Board name can not be empty"));
+		assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("Board name can not be empty"));
 	}
 	
 	@Test
 	public void validateBoardWithExistentName() {
 		String boardName = "Main Board";
 		ValidationReport report = target.validateBoardToBeCreated(TestSetUpUtils.getBoard(null, boardName));
-		this.assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("There is already a board registered with the name: " + boardName));
+		assertReportHasOnlyExpectedIssues(report, Sets.newHashSet("There is already a board registered with the name: " + boardName));
 	}
 	
 	@Test
 	public void validateBoardWithNoIssues() {
 		ValidationReport report = target.validateBoardToBeCreated(TestSetUpUtils.getBoard(null, "Board"));
-		this.assertReportHasOnlyExpectedIssues(report, Sets.newHashSet());
+		assertReportHasOnlyExpectedIssues(report, Sets.newHashSet());
 	}
 	
 	private void assertReportHasOnlyExpectedIssues(ValidationReport report, Set<String> expectedIssues) {

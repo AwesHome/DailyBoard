@@ -18,7 +18,7 @@ public class ValidationReportTest {
 		
 		String issue = "First issue";
 		report.addIssue(issue);
-		this.assertStateOfValidationReport(report, Sets.newHashSet(issue));
+		assertStateOfValidationReport(report, Sets.newHashSet(issue));
 	}
 
 	@Test
@@ -33,7 +33,7 @@ public class ValidationReportTest {
 		
 		ValidationReport mergeReport = report.merge(otherReport);
 		assertSame(report, mergeReport);
-		this.assertStateOfValidationReport(report, Sets.newHashSet(issue, otherIssue));
+		assertStateOfValidationReport(report, Sets.newHashSet(issue, otherIssue));
 	}
 	
 	@Test
@@ -41,7 +41,7 @@ public class ValidationReportTest {
 		ValidationReport report = new ValidationReport();
 		report.addIssue("");
 		report.addIssue(null);
-		this.assertStateOfValidationReport(report, new HashSet<String>());
+		assertStateOfValidationReport(report, new HashSet<String>());
 	}
 	
 	private void assertStateOfValidationReport(ValidationReport report, Set<String> expectedIssues) {

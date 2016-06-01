@@ -1,8 +1,6 @@
 package com.aweshome.dailyboard.core.validation;
 
 
-import java.util.Optional;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,35 +32,29 @@ public class BoardValidator {
 	}
 
 	private boolean boardAlreadyExists(Board board) {
-		Optional<Board> boardFound = searchForBoard(board);
-		return boardFound.isPresent();
-		
-	}
-
-	private Optional<Board> searchForBoard(Board board) {
-		Board boardFound = (Board) sessionFactory.getCurrentSession()
+		boolean boardExists = sessionFactory.getCurrentSession()
 				.createCriteria(Board.class)
 				.add(Restrictions.eq("name", board.getName()))
-				.uniqueResult();
-		return Optional.ofNullable(boardFound);
+				.uniqueResult() != null;
+		return boardExists;
 	}
 
 	private ValidationReport validateBoardHasRequiredFields(Board board) {
 		if (board == null) {
 			return new ValidationReport("No board has been received");
 		}
-		return this.validateBoardName(board);
+		return this.validateBoardName(board.getName());
 	}
 	
-	private ValidationReport validateBoardName(Board board)  {
-		if (board.getName() == null) {
+	private ValidationReport validateBoardName(String name)  {
+		if (name == null) {
 			return new ValidationReport("Board name has to be specified");
 		}
-		return validateThatBoardNameIsNotEmpty(board);
+		return validateThatBoardNameIsNotEmpty(name);
 	}
 	
-	private ValidationReport validateThatBoardNameIsNotEmpty(Board board) {
-		if (board.getName().equals("")) {
+	private ValidationReport validateThatBoardNameIsNotEmpty(String name) {
+		if (name.equals("")) {
 			return new ValidationReport("Board name can not be empty");
 		}
 		return new ValidationReport();

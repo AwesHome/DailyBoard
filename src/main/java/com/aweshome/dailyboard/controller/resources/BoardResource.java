@@ -52,37 +52,21 @@ public class BoardResource {
 
 	private Response buildCreateBoardResponse(Board boardBuilt) {
 		try {
-			return createdResponse(boardBuilt);
+			Board newBoard = this.boardService.createBoard(boardBuilt);
+			return Response.created(URI.create("/Board/" + newBoard.getId())).build();
 		} catch (Exception e) {
-			return badRequestResponse(e);
+			return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
 
 	private Response buildGetBoardResponse(Optional<Board> board) {
 		if (board.isPresent()){
-			return okResponse(board.get());
+			BoardDTO boardDTO = this.buildBoardDTO(board.get());
+			return Response.ok(boardDTO).build();
 		}
-			return notFoundResponse();
-	}
-
-	private Response okResponse(Board board) {
-		BoardDTO boardDTO = this.buildBoardDTO(board);
-		return Response.ok(boardDTO).build();
-	}
-
-	private Response notFoundResponse() {
 		return Response.status(Status.NOT_FOUND).build();
 	}
 
-	private Response badRequestResponse(Exception e) {
-		return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
-	}
-
-	private Response createdResponse(Board boardBuilt) throws Exception {
-		Board newBoard = this.boardService.createBoard(boardBuilt);
-		return Response.created(URI.create("/Board/" + newBoard.getId())).build();
-	}
-	
 	private BoardDTO buildBoardDTO(Board board) {
 		Builder<Board, BoardDTO> builder = this.builderFactory.getBuilder(Board.class);
 		BoardDTO boardDTO = builder.buildDTOFrom(board);

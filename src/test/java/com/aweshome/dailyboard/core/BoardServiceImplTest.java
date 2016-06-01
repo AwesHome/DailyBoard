@@ -66,7 +66,7 @@ public class BoardServiceImplTest {
 	public void createBoardThrowsExceptionWhenThereIsOneValidationIssue() throws Exception {
 		String issue = "Board name can't be empty";
 		String expectedMessage = issue;
-		this.assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, issue);
+		assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, issue);
 	}
 	
 	@Test
@@ -74,7 +74,7 @@ public class BoardServiceImplTest {
 		String firstIssue = "Board name can't be empty";
 		String secondIssue = "Board field with invalid data";
 		String expectedMessage = firstIssue + ", " + secondIssue;
-		this.assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, firstIssue, secondIssue);
+		assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, firstIssue, secondIssue);
 	}
 	
 	private void assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(String expectedMessage, String...issues) throws Exception {
