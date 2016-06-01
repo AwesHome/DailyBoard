@@ -20,14 +20,16 @@ public class BuilderFactoryTest {
 	public void getBuilder() {
 		Builder<Board, BoardDTO> boardBuilder = target.getBuilder(Board.class);
 		assertTrue(boardBuilder instanceof BoardDTOBuilder);
-		BoardDTOBuilder boardDTOBuilder = (BoardDTOBuilder) boardBuilder;
-		assertNotNull(boardDTOBuilder.getPostDTOBuilder());
-		
+		assertBoardBuilderHasPostBuilder((BoardDTOBuilder) boardBuilder);
+	}
+	
+	@Test
+	public void getBuilderForPost() {
 		Builder<Post, PostDTO> postBuilder = target.getBuilder(Post.class);
 		assertTrue(postBuilder instanceof PostDTOBuilder); 
-		
-		//should I just return null or throw an exception when there's no builder?
-		//depends on what you want, if you return null everytime you call it you gotta check for null, if you trow an exception you will have to use try/catch everytime, unchecked exceptions are not really good for this. I personally would return an Optional<Builder<IO>>
 	}
-
+	
+	private void assertBoardBuilderHasPostBuilder(BoardDTOBuilder boardDTOBuilder) {
+		assertNotNull(boardDTOBuilder.getPostDTOBuilder());
+	}
 }

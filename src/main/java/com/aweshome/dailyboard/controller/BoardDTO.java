@@ -42,21 +42,21 @@ public class BoardDTO {
 			return false;
 		}
 		BoardDTO other = (BoardDTO) obj;
-		if (id == null) {
-			if (other.id != null) {
+		if (this.getId() == null) {
+			if (other.getId() != null) {
 				return false;
 			}
-		} else if (!id.equals(other.id)) {
+		} else if (!this.getId().equals(other.getId())) {
 			return false;
 		}
-		if (name == null) {
-			if (other.name != null) {
+		if (this.getName() == null) {
+			if (other.getName() != null) {
 				return false;
 			}
-		} else if (!name.equals(other.name)) {
+		} else if (!this.getName().equals(other.getName())) {
 			return false;
 		}
-		if (!posts.equals(other.posts)) {
+		if (!this.getPosts().equals(other.getPosts())) {
 			return false;
 		}
 		return true;

@@ -22,16 +22,15 @@ public class BoardDTOBuilderTest {
 	@Before
 	public void setUp() {
 		PostDTOBuilder postDTOBuilder = mock(PostDTOBuilder.class);
-		when(postDTOBuilder.buildDTO(any(Post.class))).thenReturn(new PostDTO(""));
-		when(postDTOBuilder.buildEntity(any(PostDTO.class))).thenReturn(new Post());
+		when(postDTOBuilder.buildDTOFrom(any(Post.class))).thenReturn(new PostDTO(""));
+		when(postDTOBuilder.buildEntityFrom(any(PostDTO.class))).thenReturn(new Post());
 		this.target = new BoardDTOBuilder(postDTOBuilder);
 	}
 	
 	@Test
 	public void buildDTO() {
 		Board board = TestSetUpUtils.getBoard(1L, "test board", "post with content", "second post");
-		
-		BoardDTO boardDTO = target.buildDTO(board);
+		BoardDTO boardDTO = target.buildDTOFrom(board);
 		
 		assertNotNull(boardDTO);
 		assertEquals(board.getName(), boardDTO.getName());
@@ -43,8 +42,7 @@ public class BoardDTOBuilderTest {
 	@Test
 	public void buildEntity() {
 		BoardDTO boardDTO = TestSetUpUtils.getBoardDTO(1L, "test board", "post with content", "second post");
-		
-		Board board = target.buildEntity(boardDTO);
+		Board board = target.buildEntityFrom(boardDTO);
 		
 		assertNotNull(board);
 		assertEquals(boardDTO.getName(), board.getName());

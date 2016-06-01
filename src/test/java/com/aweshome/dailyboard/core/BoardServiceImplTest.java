@@ -1,11 +1,14 @@
 package com.aweshome.dailyboard.core;
 
 import static org.junit.Assert.*;
-
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -14,46 +17,119 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import com.aweshome.dailyboard.TestSetUpUtils;
+import com.aweshome.dailyboard.core.validation.BoardValidator;
+import com.aweshome.dailyboard.core.validation.ValidationReport;
 import com.aweshome.dailyboard.model.Board;
 import com.aweshome.dailyboard.model.Post;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+
+import jersey.repackaged.com.google.common.collect.Sets;
 
 @RunWith(SpringJUnit4ClassRunner.class) 
 @ContextConfiguration(locations = { "../spring-context.xml" })
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
     TransactionalTestExecutionListener.class,
     DbUnitTestExecutionListener.class})
-@DatabaseSetup(connection="dataSource", value="BoardServiceImplTest-scenario.xml")
+@DatabaseSetup(connection="dataSource", value="BasicScenario.xml")
 public class BoardServiceImplTest {
 	
 	@Autowired
 	private BoardServiceImpl target;
 	
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
 	@Test
 	public void getBoardTest() {
-		Board board = target.getBoard(1L);
-		
-		assertNotNull(board);
-		List<Post> posts = board.getPosts();
-		assertNotNull(posts.get(0).getContent());
-		assertNotEquals("", posts.get(0).getContent());
+		Long expectedBoardId = 1L;
+		Optional<Board> board = target.findBoard(expectedBoardId);
+		assertBoardMatchesScenario(expectedBoardId, board);
+		assertPostsMatchScenario(board);
 	}
 	
 	@Test
 	public void createBoardTest() {
-		Board board = TestSetUpUtils.getBoard(null, "Board being saved");
-		
-		Board savedBoard = target.createBoard(board);
-		
-		assertNotNull(savedBoard);
-		assertNotNull(savedBoard.getId());
-		assertEquals(board.getName(), savedBoard.getName());
-		
-		Board obtainedBoard = target.getBoard(savedBoard.getId());
-		assertNotNull(obtainedBoard);
-		assertEquals(savedBoard.getId(), obtainedBoard.getId());
-		assertEquals(savedBoard.getName(), obtainedBoard.getName());
+		this.mockBoardValidatorToReturn();
+		Board boardToBeCreated = TestSetUpUtils.getBoard(null, "Board being saved");
+		try {
+			Board createdBoard = target.createBoard(boardToBeCreated);
+			assertCreatedBoardMaintainedAllFieldsAndHasId(boardToBeCreated, createdBoard);
+			Optional<Board> boardObtainedBySearch = target.findBoard(createdBoard.getId());
+			assertThatBoardObtainedBySearchIsTheCreatedBoard(boardObtainedBySearch, createdBoard);
+		} catch (Exception e) {
+			fail();
+		}
+	}
+	
+	@Test
+	public void createBoardThrowsExceptionWhenThereIsOneValidationIssue() throws Exception {
+		String issue = "Board name can't be empty";
+		String expectedMessage = issue;
+		this.assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, issue);
+	}
+	
+	@Test
+	public void createBoardThrowsExceptionWhenThereAreValidationIssues() throws Exception {
+		String firstIssue = "Board name can't be empty";
+		String secondIssue = "Board field with invalid data";
+		String expectedMessage = firstIssue + ", " + secondIssue;
+		this.assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, firstIssue, secondIssue);
+	}
+	
+	private void assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(String expectedMessage, String...issues) throws Exception {
+		this.mockBoardValidatorToReturn(issues);
+		thrown.expect(Exception.class);
+		thrown.expectMessage(expectedMessage);
+		target.createBoard(new Board());
+	}
+	
+	private void mockBoardValidatorToReturn(String...issues) {
+		ValidationReport validationReport = mockValidationReportToReturn(issues);
+		mockBoardValidatorToReturnValidationReport(validationReport);
 	}
 
+	private ValidationReport mockValidationReportToReturn(String... issues) {
+		ValidationReport validationReport= mock(ValidationReport.class);
+		boolean hasIssues = issues.length > 0;
+		when(validationReport.hasIssues()).thenReturn(hasIssues);
+		when(validationReport.getIssues()).thenReturn(Sets.newHashSet(issues));
+		return validationReport;
+	}
+
+	private void mockBoardValidatorToReturnValidationReport(ValidationReport validationReport) {
+		BoardValidator boardValidator = mock(BoardValidator.class);
+		when(boardValidator.validateBoardToBeCreated(any(Board.class))).thenReturn(validationReport);
+		target.setBoardValidator(boardValidator);
+	}
+	
+
+	private void assertBoardMatchesScenario(Long expectedBoardId, Optional<Board> board) {
+		assertTrue(board.isPresent());
+		assertEquals("Main Board", board.get().getName());
+		assertEquals(expectedBoardId, board.get().getId());
+	}
+
+	private void assertPostsMatchScenario(Optional<Board> board) {
+		Long expectedIdForFirstPost = 1L;
+		Long expectedIdForSecondPost = 2L;
+		List<Post> posts = board.get().getPosts();
+		assertEquals(2, posts.size());
+		assertEquals(expectedIdForFirstPost, posts.get(0).getId());
+		assertEquals(expectedIdForSecondPost, posts.get(1).getId());
+		assertEquals("first post content", posts.get(0).getContent());
+		assertEquals("second post content", posts.get(1).getContent());
+	}
+	
+	private void assertCreatedBoardMaintainedAllFieldsAndHasId(Board boardToBeCreated, Board createdBoard) {
+		assertNotNull(createdBoard);
+		assertNotNull(createdBoard.getId());
+		assertEquals(boardToBeCreated.getName(), createdBoard.getName());
+	}
+	
+	private void assertThatBoardObtainedBySearchIsTheCreatedBoard(Optional<Board> boardObtainedBySearch, Board createdBoard) {
+		assertTrue(boardObtainedBySearch.isPresent());
+		assertEquals(createdBoard, boardObtainedBySearch.get());
+	}
 }
+

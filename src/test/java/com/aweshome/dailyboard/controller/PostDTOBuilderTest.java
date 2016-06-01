@@ -12,11 +12,11 @@ public class PostDTOBuilderTest {
 
 	private Builder<Post, PostDTO> target = new PostDTOBuilder();
 	
-	@Test
+	@Test()
 	public void buildDTO() {
 		String content = "post content area";
 		Post post = new Post(content);
-		PostDTO postDTO = target.buildDTO(post);
+		PostDTO postDTO = target.buildDTOFrom(post);
 		Assert.assertEquals(content, postDTO.getContent());
 	}
 	
@@ -24,7 +24,7 @@ public class PostDTOBuilderTest {
 	public void buildEntity() {
 		String content = "post content area";
 		PostDTO postDTO = new PostDTO(content);
-		Post post = target.buildEntity(postDTO);
+		Post post = target.buildEntityFrom(postDTO);
 		Assert.assertEquals(content, post.getContent());
 	}
 }

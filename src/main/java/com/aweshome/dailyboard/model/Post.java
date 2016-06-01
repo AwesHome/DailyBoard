@@ -54,18 +54,18 @@ public class Post {
 			return false;
 		}
 		Post other = (Post) obj;
-		if (content == null) {
-			if (other.content != null) {
+		if (this.getContent() == null) {
+			if (other.getContent() != null) {
 				return false;
 			}
-		} else if (!content.equals(other.content)) {
+		} else if (!this.getContent().equals(other.getContent())) {
 			return false;
 		}
-		if (id == null) {
-			if (other.id != null) {
+		if (this.getId() == null) {
+			if (other.getId() != null) {
 				return false;
 			}
-		} else if (!id.equals(other.id)) {
+		} else if (!this.getId().equals(other.getId())) {
 			return false;
 		}
 		return true;

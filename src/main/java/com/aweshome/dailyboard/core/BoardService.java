@@ -1,12 +1,14 @@
 package com.aweshome.dailyboard.core;
 
 
+import java.util.Optional;
+
 import com.aweshome.dailyboard.model.Board;
 
 public interface BoardService {
 
-	Board getBoard(Long id);
+	Optional<Board> findBoard(Long id);
 
-	Board createBoard(Board board);
+	Board createBoard(Board board) throws Exception;
 
 }

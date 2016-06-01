@@ -12,24 +12,24 @@ public class BoardDTOBuilder implements Builder<Board, BoardDTO> {
 	}
 
 	@Override
-	public BoardDTO buildDTO(Board input) {
+	public BoardDTO buildDTOFrom(Board input) {
 		BoardDTO boardDTO = new BoardDTO();
 		boardDTO.setId(input.getId());
 		boardDTO.setName(input.getName());
 		for (Post post : input.getPosts()) {
-			PostDTO postDTO = this.postDTOBuilder.buildDTO(post);
+			PostDTO postDTO = this.postDTOBuilder.buildDTOFrom(post);
 			boardDTO.addPost(postDTO);
 		}
 		return boardDTO ;
 	}
 
 	@Override
-	public Board buildEntity(BoardDTO input) {
+	public Board buildEntityFrom(BoardDTO input) {
 		Board board = new Board();
 		board.setId(input.getId());
 		board.setName(input.getName());
 		for (PostDTO postDTO : input.getPosts()) {
-			Post post = this.postDTOBuilder.buildEntity(postDTO);
+			Post post = this.postDTOBuilder.buildEntityFrom(postDTO);
 			board.addPost(post);
 		}
 		return board ;

@@ -28,11 +28,11 @@ public class PostDTO {
 			return false;
 		}
 		PostDTO other = (PostDTO) obj;
-		if (content == null) {
-			if (other.content != null) {
+		if (this.getContent() == null) {
+			if (other.getContent() != null) {
 				return false;
 			}
-		} else if (!content.equals(other.content)) {
+		} else if (!this.getContent().equals(other.getContent())) {
 			return false;
 		}
 		return true;
