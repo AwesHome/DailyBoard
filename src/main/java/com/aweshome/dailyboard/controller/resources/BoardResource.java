@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.aweshome.dailyboard.core.BoardService;
+import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.model.Board;
 import com.aweshome.dailyboard.controller.BoardDTO;
 import com.aweshome.dailyboard.controller.Builder;
@@ -54,7 +55,7 @@ public class BoardResource {
 		try {
 			Board newBoard = this.boardService.createBoard(boardBuilt);
 			return Response.created(URI.create("/Board/" + newBoard.getId())).build();
-		} catch (Exception e) {
+		} catch (ValidationException e) {
 			return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}

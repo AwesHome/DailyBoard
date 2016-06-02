@@ -18,6 +18,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 
 import com.aweshome.dailyboard.TestSetUpUtils;
 import com.aweshome.dailyboard.core.validation.BoardValidator;
+import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.core.validation.ValidationReport;
 import com.aweshome.dailyboard.model.Board;
 import com.aweshome.dailyboard.model.Post;
@@ -57,29 +58,29 @@ public class BoardServiceImplTest {
 			assertCreatedBoardMaintainedAllFieldsAndHasId(boardToBeCreated, createdBoard);
 			Optional<Board> boardObtainedBySearch = target.findBoard(createdBoard.getId());
 			assertThatBoardObtainedBySearchIsTheCreatedBoard(boardObtainedBySearch, createdBoard);
-		} catch (Exception e) {
+		} catch (ValidationException e) {
 			fail();
 		}
 	}
 	
 	@Test
-	public void createBoardThrowsExceptionWhenThereIsOneValidationIssue() throws Exception {
+	public void createBoardThrowsExceptionWhenThereIsOneValidationIssue() throws ValidationException {
 		String issue = "Board name can't be empty";
 		String expectedMessage = issue;
 		assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, issue);
 	}
 	
 	@Test
-	public void createBoardThrowsExceptionWhenThereAreValidationIssues() throws Exception {
+	public void createBoardThrowsExceptionWhenThereAreValidationIssues() throws ValidationException {
 		String firstIssue = "Board name can't be empty";
 		String secondIssue = "Board field with invalid data";
 		String expectedMessage = firstIssue + ", " + secondIssue;
 		assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, firstIssue, secondIssue);
 	}
 	
-	private void assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(String expectedMessage, String...issues) throws Exception {
+	private void assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(String expectedMessage, String...issues) throws ValidationException {
 		this.mockBoardValidatorToReturn(issues);
-		thrown.expect(Exception.class);
+		thrown.expect(ValidationException.class);
 		thrown.expectMessage(expectedMessage);
 		target.createBoard(new Board());
 	}

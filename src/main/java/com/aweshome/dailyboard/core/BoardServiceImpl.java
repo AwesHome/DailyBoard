@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aweshome.dailyboard.core.validation.BoardValidator;
+import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.core.validation.ValidationReport;
 import com.aweshome.dailyboard.model.Board;
 
@@ -33,18 +34,18 @@ public class BoardServiceImpl implements BoardService{
 	}
 
 	@Override
-	public Board createBoard(Board board) throws Exception {
+	public Board createBoard(Board board) throws ValidationException {
 		this.validateBoardToBeCreated(board);
 		sessionFactory.getCurrentSession().save(board);
 		return board;
 		
 	}
 
-	private void validateBoardToBeCreated(Board board) throws Exception {
+	private void validateBoardToBeCreated(Board board) throws ValidationException {
 		ValidationReport report = this.boardValidator.validateBoardToBeCreated(board);
 		if (report.hasIssues()) {
 			String message = this.buildMessageForException(report.getIssues());
-			throw new Exception(message);
+			throw new ValidationException(message);
 		}
 	}
 

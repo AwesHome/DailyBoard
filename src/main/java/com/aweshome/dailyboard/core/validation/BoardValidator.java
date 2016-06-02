@@ -32,11 +32,10 @@ public class BoardValidator {
 	}
 
 	private boolean boardAlreadyExists(Board board) {
-		boolean boardExists = sessionFactory.getCurrentSession()
+		return sessionFactory.getCurrentSession()
 				.createCriteria(Board.class)
 				.add(Restrictions.eq("name", board.getName()))
 				.uniqueResult() != null;
-		return boardExists;
 	}
 
 	private ValidationReport validateBoardHasRequiredFields(Board board) {

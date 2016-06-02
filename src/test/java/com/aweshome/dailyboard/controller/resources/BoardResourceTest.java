@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.aweshome.dailyboard.TestSetUpUtils;
 import com.aweshome.dailyboard.core.BoardService;
+import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.model.Board;
 import com.aweshome.dailyboard.controller.BoardDTO;
 import com.aweshome.dailyboard.controller.BoardDTOBuilder;
@@ -59,7 +60,7 @@ public class BoardResourceTest {
 	}
 	
 	@Test
-	public void createBoard() throws Exception {
+	public void createBoard() throws ValidationException {
 		BoardDTO boardDTOToBeCreated = TestSetUpUtils.getBoardDTO(null, "Main Board", "post content");
 		Board boardBuilt = TestSetUpUtils.getBoard(null, "Main Board", "post content");
 		Board boardCreated = TestSetUpUtils.getBoard(1L, "Main Board", "post content");
@@ -72,7 +73,7 @@ public class BoardResourceTest {
 	}
 	
 	@Test
-	public void createBoardSuccessfullResponse() throws Exception {
+	public void createBoardSuccessfullResponse() throws ValidationException {
 		Board boardCreated = TestSetUpUtils.getBoard(1L, "Main Board", "post content");
 		when(boardService.createBoard(any(Board.class))).thenReturn(boardCreated);
 		Response response = target.createBoard(new BoardDTO());
@@ -82,9 +83,9 @@ public class BoardResourceTest {
 	}
 
 	@Test
-	public void createBoardErrorResponse() throws Exception {
+	public void createBoardErrorResponse() throws ValidationException {
 		String errorMessage = "error message";
-		when(boardService.createBoard(any(Board.class))).thenThrow(new RuntimeException(errorMessage));
+		when(boardService.createBoard(any(Board.class))).thenThrow(new ValidationException(errorMessage));
 		Response response = target.createBoard(new BoardDTO());
 		assertEquals(Status.BAD_REQUEST, response.getStatusInfo());
 		assertEquals(errorMessage, response.getEntity());
@@ -107,7 +108,7 @@ public class BoardResourceTest {
 		assertEquals(board, result);
 	}
 	
-	private void assertBoardIsSentToBeCreated(Board board) throws Exception {
+	private void assertBoardIsSentToBeCreated(Board board) throws ValidationException {
 		ArgumentCaptor<Board> boardSentToBeCreated = ArgumentCaptor.forClass(Board.class);
 		verify(boardService).createBoard(boardSentToBeCreated.capture());
 		assertEquals(board, boardSentToBeCreated.getValue());
