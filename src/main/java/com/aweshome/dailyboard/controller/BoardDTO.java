@@ -1,5 +1,9 @@
 package com.aweshome.dailyboard.controller;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +31,10 @@ public class BoardDTO {
 
 	public List<PostDTO> getPosts() {
 		return new ArrayList<PostDTO>(this.posts);
+	}
+
+	public void setPosts(List<PostDTO> posts) {
+		this.posts = posts;
 	}
 
 	public void addPost(PostDTO postDTO) {

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
+import com.aweshome.dailyboard.core.validation.NewPostValidator;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -13,10 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.aweshome.dailyboard.core.validation.BoardValidator;
+import com.aweshome.dailyboard.core.validation.NewBoardValidator;
 import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.core.validation.ValidationReport;
 import com.aweshome.dailyboard.model.Board;
+import com.aweshome.dailyboard.model.Post;
 
 @Service
 @Transactional
@@ -24,9 +26,6 @@ public class BoardServiceImpl implements BoardService{
 	
 	@Autowired
 	private SessionFactory sessionFactory;
-	
-	@Autowired
-	private BoardValidator boardValidator;
 	
 	@Override
 	public Optional<Board> findBoard(Long id) {
@@ -44,6 +43,16 @@ public class BoardServiceImpl implements BoardService{
 		sessionFactory.getCurrentSession().save(board);
 		return board;
 		
+	}
+	
+	@Override
+	public Post createPostForBoard(Post post, Long boardId) throws ValidationException {
+        Board board = this.findBoard(boardId).get();
+        ValidationReport report = new NewPostValidator().validate(post);
+        if (report.hasIssues()) throw new ValidationException(this.buildMessageForException(report.getIssues()));
+		board.addPost(post);
+		sessionFactory.getCurrentSession().update(board);
+		return post;
 	}
 
 	@Override
@@ -82,20 +91,16 @@ public class BoardServiceImpl implements BoardService{
 	}
 
 	private void validateBoardToBeCreated(Board board) throws ValidationException {
-		ValidationReport report = this.boardValidator.validateBoardToBeCreated(board);
-		if (report.hasIssues()) {
-			String message = this.buildMessageForException(report.getIssues());
-			throw new ValidationException(message);
+		ValidationReport report = new NewBoardValidator(this.sessionFactory).validate(board);
+		NewPostValidator newPostValidator = new NewPostValidator();
+		for(Post post: board.getPosts()) {
+			report.merge(newPostValidator.validate(post));
 		}
+		if (report.hasIssues()) throw new ValidationException(this.buildMessageForException(report.getIssues()));
 	}
 
 	private String buildMessageForException(Collection<String> issues) {
 		String message = String.join(", ", issues);
 		return message;
-	}
-
-	public void setBoardValidator(BoardValidator boardValidator) {
-		this.boardValidator = boardValidator;
-		
 	}
 }

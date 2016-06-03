@@ -8,6 +8,8 @@ public class PostDTO {
 		 this.content = content;
 	}
 
+	public PostDTO(){}
+
 	public void setContent(String content) {
 		this.content = content;
 	}

@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class ValidationReport {
 	
-	private Set<String> issues = new HashSet<String>();
+	private Set<String> issues = new HashSet<>();
 	
 	public ValidationReport(String... issues) {
 		for (String issue : issues) {

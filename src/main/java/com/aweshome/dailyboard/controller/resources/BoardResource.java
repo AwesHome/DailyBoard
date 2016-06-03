@@ -16,6 +16,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
+import com.aweshome.dailyboard.controller.PostDTO;
+import com.aweshome.dailyboard.model.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +52,20 @@ public class BoardResource {
 			return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
+
+	@POST
+	@Path("{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createPost(@PathParam("id") long boardId, PostDTO postDTO) {
+		Post postBuilt = this.builderFactory.getBuilder(Post.class).buildEntityFrom(postDTO);
+		try {
+			Post newPost = this.boardService.createPostForBoard(postBuilt, boardId);
+			return Response.created(URI.create(this.path + boardId + "/Post/" + newPost.getId())).build();
+		} catch (ValidationException e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
+	}
 	
 	@GET
 	@Path("{id}")
@@ -71,8 +87,8 @@ public class BoardResource {
 		if (board.isPresent()){
 			Long nextBoardId = this.boardService.getNextBoardId(board.get());
 			BoardDTO boardDTO = (BoardDTO) this.builderFactory.getBuilder(Board.class).buildDTOFrom(board.get());
-			URI uri = uriInfo.getBaseUriBuilder().path(this.path + nextBoardId.toString()).build();
-			return Response.ok(boardDTO).link(uri, "next").build();
+			URI nextBoardUri = uriInfo.getBaseUriBuilder().path(this.path + nextBoardId.toString()).build();
+			return Response.ok(boardDTO).link(nextBoardUri, "next").build();
 		}
 		return Response.status(Status.NOT_FOUND).build();
 	}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,8 +35,8 @@ public class Board {
 		this.id = id;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinColumn(name = "board_id", referencedColumnName = "id")
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "board_id", referencedColumnName = "id", nullable = false)
 	public List<Post> getPosts() {
 		return new ArrayList<Post>(this.posts);
 	}
@@ -45,6 +46,11 @@ public class Board {
 	}
 	
 	public void addPost(Post post) {
+		if(this.posts.size() > 0) {
+			for(Post oldPost: this.posts) {
+				if(oldPost.getContent().equals(post.getContent())) return;
+			}
+		}
 		this.posts.add(post);
 	}
 

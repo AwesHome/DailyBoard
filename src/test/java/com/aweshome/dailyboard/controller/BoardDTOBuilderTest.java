@@ -6,13 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.* ;
 
-import com.aweshome.dailyboard.TestSetUpUtils;
+import com.aweshome.dailyboard.TestUtils;
 import com.aweshome.dailyboard.model.Board;
 import com.aweshome.dailyboard.model.Post;
-import com.aweshome.dailyboard.controller.BoardDTO;
-import com.aweshome.dailyboard.controller.BoardDTOBuilder;
-import com.aweshome.dailyboard.controller.PostDTO;
-import com.aweshome.dailyboard.controller.PostDTOBuilder;
 
 
 public class BoardDTOBuilderTest {
@@ -23,13 +19,13 @@ public class BoardDTOBuilderTest {
 	public void setUp() {
 		PostDTOBuilder postDTOBuilder = mock(PostDTOBuilder.class);
 		when(postDTOBuilder.buildDTOFrom(any(Post.class))).thenReturn(new PostDTO(""));
-		when(postDTOBuilder.buildEntityFrom(any(PostDTO.class))).thenReturn(new Post());
+		when(postDTOBuilder.buildEntityFrom(any(PostDTO.class))).thenReturn(new Post("first"), new Post("second"));
 		this.target = new BoardDTOBuilder(postDTOBuilder);
 	}
 	
 	@Test
 	public void buildDTO() {
-		Board board = TestSetUpUtils.getBoard(1L, "test board", "post with content", "second post");
+		Board board = TestUtils.getBoard(1L, "test board", "post with content", "second post");
 		BoardDTO boardDTO = target.buildDTOFrom(board);
 		
 		assertNotNull(boardDTO);
@@ -41,7 +37,7 @@ public class BoardDTOBuilderTest {
 	
 	@Test
 	public void buildEntity() {
-		BoardDTO boardDTO = TestSetUpUtils.getBoardDTO(1L, "test board", "post with content", "second post");
+		BoardDTO boardDTO = TestUtils.getBoardDTO(1L, "test board", "post with content", "second post");
 		Board board = target.buildEntityFrom(boardDTO);
 		
 		assertNotNull(board);
