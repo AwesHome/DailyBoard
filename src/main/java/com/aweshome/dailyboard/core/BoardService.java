@@ -7,9 +7,13 @@ import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.model.Board;
 
 public interface BoardService {
+	
+	Board createBoard(Board board) throws ValidationException;
 
 	Optional<Board> findBoard(Long id);
-
-	Board createBoard(Board board) throws ValidationException;
+	
+	Optional<Board> getFirstBoard();
+	
+	Long getNextBoardId(Board board);
 
 }

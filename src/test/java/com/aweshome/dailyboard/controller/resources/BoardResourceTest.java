@@ -2,7 +2,6 @@ package com.aweshome.dailyboard.controller.resources;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.aweshome.dailyboard.TestSetUpUtils;
 import com.aweshome.dailyboard.core.BoardService;
@@ -21,55 +20,35 @@ import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 public class BoardResourceTest {
 	
 	private BoardResource target = new BoardResource();
-	private Builder<Board, BoardDTO> boardDTOBuilder;
 	private BoardService boardService;
+	private UriInfo uriInfo;
+	private String path = "localhost:8080";
+	private Long nextBoardId = 1L;
+	private BoardDTO boardDTO = TestSetUpUtils.getBoardDTO(1L, "main board", "most important post");
 	
 	@Before
 	public void setUp() {
-		boardDTOBuilder = mock(BoardDTOBuilder.class);
-		BuilderFactory builderFactory = mock(BuilderFactory.class);
-		boardService = mock(BoardService.class);
-		when(builderFactory.<Board, BoardDTO>getBuilder(Board.class)).thenReturn(boardDTOBuilder);
+		Builder<Board, BoardDTO> boardDTOBuilder = mock(BoardDTOBuilder.class);
 		when(boardDTOBuilder.buildEntityFrom(any(BoardDTO.class))).thenReturn(new Board());
+		when(boardDTOBuilder.buildDTOFrom(any(Board.class))).thenReturn(boardDTO);
+		
+		BuilderFactory builderFactory = mock(BuilderFactory.class);
+		when(builderFactory.<Board, BoardDTO>getBuilder(Board.class)).thenReturn(boardDTOBuilder);
+		
+		boardService = mock(BoardService.class);
+		when(boardService.getNextBoardId(any(Board.class))).thenReturn(nextBoardId);
+
+		uriInfo = mock(UriInfo.class);
+		when(uriInfo.getBaseUriBuilder()).thenReturn(UriBuilder.fromPath(path));
 
 		target.setBuilderFactory(builderFactory);
 		target.setBoardService(boardService);
-	}
-	
-	@Test
-	public void findBoard() {
-		Board boardReturnedBySearch = TestSetUpUtils.getBoard(1L, "main board", "most important post");
-		when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(boardReturnedBySearch));
-		BoardDTO boardBuilt = TestSetUpUtils.getBoardDTO(1L, "main board", "most important post");
-		when(boardDTOBuilder.buildDTOFrom(any(Board.class))).thenReturn(boardBuilt);
-		
-		Response resultResponse = target.getBoard(1L);
-		assertBoardIsSentToBuilder(boardReturnedBySearch);
-		assertBoardIsReturnedInResponse(boardBuilt, resultResponse);
-	}
-
-	@Test
-	public void findNonExistentBoard() {
-		when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(null));
-		Response result = target.getBoard(1L);
-		assertEquals(Status.NOT_FOUND, result.getStatusInfo());
-	}
-	
-	@Test
-	public void createBoard() throws ValidationException {
-		BoardDTO boardDTOToBeCreated = TestSetUpUtils.getBoardDTO(null, "Main Board", "post content");
-		Board boardBuilt = TestSetUpUtils.getBoard(null, "Main Board", "post content");
-		Board boardCreated = TestSetUpUtils.getBoard(1L, "Main Board", "post content");
-		when(boardDTOBuilder.buildEntityFrom(any(BoardDTO.class))).thenReturn(boardBuilt);
-		when(boardService.createBoard(any(Board.class))).thenReturn(boardCreated);
-		target.createBoard(boardDTOToBeCreated);
-		
-		assertBoardDTOIsSentToBuilder(boardDTOToBeCreated);
-		assertBoardIsSentToBeCreated(boardBuilt);
 	}
 	
 	@Test
@@ -77,11 +56,10 @@ public class BoardResourceTest {
 		Board boardCreated = TestSetUpUtils.getBoard(1L, "Main Board", "post content");
 		when(boardService.createBoard(any(Board.class))).thenReturn(boardCreated);
 		Response response = target.createBoard(new BoardDTO());
-		
 		assertEquals(Status.CREATED, response.getStatusInfo());
 		assertEquals("/Board/" + boardCreated.getId(), response.getLocation().getPath());
 	}
-
+	
 	@Test
 	public void createBoardErrorResponse() throws ValidationException {
 		String errorMessage = "error message";
@@ -91,26 +69,38 @@ public class BoardResourceTest {
 		assertEquals(errorMessage, response.getEntity());
 	}
 	
-	private void assertBoardIsSentToBuilder(Board board) {
-		ArgumentCaptor<Board> boardSentToBuilder = ArgumentCaptor.forClass(Board.class);
-		verify(boardDTOBuilder).buildDTOFrom(boardSentToBuilder.capture());
-		assertEquals(board, boardSentToBuilder.getValue());
-	}
-	
-	private void assertBoardDTOIsSentToBuilder(BoardDTO boardDTO) {
-		ArgumentCaptor<BoardDTO> boardDTOSentToBuilder = ArgumentCaptor.forClass(BoardDTO.class);
-		verify(boardDTOBuilder).buildEntityFrom(boardDTOSentToBuilder.capture());
-		assertEquals(boardDTO, boardDTOSentToBuilder.getValue());
+	@Test
+	public void findExistentBoard() {
+		when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(new Board()));
+		Response resultResponse = target.getBoard(1L, uriInfo);
+		assertFindBoardResponseIsBuiltCorrectly(resultResponse);
 	}
 
-	private void assertBoardIsReturnedInResponse(BoardDTO board, Response response) {
-		BoardDTO result = (BoardDTO) response.getEntity();
-		assertEquals(board, result);
+	@Test
+	public void findNonExistentBoard() {
+		when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(null));
+		Response result = target.getBoard(1L, uriInfo);
+		assertEquals(Status.NOT_FOUND, result.getStatusInfo());
 	}
 	
-	private void assertBoardIsSentToBeCreated(Board board) throws ValidationException {
-		ArgumentCaptor<Board> boardSentToBeCreated = ArgumentCaptor.forClass(Board.class);
-		verify(boardService).createBoard(boardSentToBeCreated.capture());
-		assertEquals(board, boardSentToBeCreated.getValue());
+	@Test
+	public void getFirstBoardFindsBoard() {
+		when(boardService.getFirstBoard()).thenReturn(Optional.ofNullable(new Board()));
+		Response resultResponse = target.getFirstBoard(uriInfo);
+		assertFindBoardResponseIsBuiltCorrectly(resultResponse);
+	}
+
+	@Test
+	public void getFirstBoardDoesntFindAnything() {
+		when(boardService.getFirstBoard()).thenReturn(Optional.ofNullable(null));
+		Response result = target.getFirstBoard(uriInfo);
+		assertEquals(Status.NOT_FOUND, result.getStatusInfo());
+	}
+
+
+	private void assertFindBoardResponseIsBuiltCorrectly(Response response) {
+		BoardDTO result = (BoardDTO) response.getEntity();
+		assertEquals(boardDTO, result);
+		assertEquals(path + "/Board/" + nextBoardId , response.getLink("next").getUri().toString());
 	}
 }

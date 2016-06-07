@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <dataset>
-	<board id = "1" name = "Main Board"/>
+	<board id = "1" name = "Main Board" last_modified ="2016-04-29 14:07:46"/>
 	
 	<post id = "1" text = "first post content" board_id = "1"/>
 	<post id = "2" text = "second post content" board_id = "1"/>
+	
+	<board id = "2" name = "First Board" last_modified ="2016-04-21 15:01:08"/>
+	
+	<board id = "3" name = "Second Board" last_modified ="2016-04-21 15:01:08"/> 
 </dataset>

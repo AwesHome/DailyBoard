@@ -40,14 +40,6 @@ public class BoardServiceImplTest {
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-
-	@Test
-	public void getBoardTest() {
-		Long expectedBoardId = 1L;
-		Optional<Board> board = target.findBoard(expectedBoardId);
-		assertBoardMatchesScenario(expectedBoardId, board);
-		assertPostsMatchScenario(board);
-	}
 	
 	@Test
 	public void createBoardTest() {
@@ -78,33 +70,40 @@ public class BoardServiceImplTest {
 		assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(expectedMessage, firstIssue, secondIssue);
 	}
 	
-	private void assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(String expectedMessage, String...issues) throws ValidationException {
-		this.mockBoardValidatorToReturn(issues);
-		thrown.expect(ValidationException.class);
-		thrown.expectMessage(expectedMessage);
-		target.createBoard(new Board());
+	@Test
+	public void getBoardTest() {
+		Long expectedBoardId = 1L;
+		Optional<Board> board = target.findBoard(expectedBoardId);
+		assertBoardMatchesScenario(expectedBoardId, board);
+		assertPostsMatchScenario(board);
 	}
 	
-	private void mockBoardValidatorToReturn(String...issues) {
-		ValidationReport validationReport = mockValidationReportToReturn(issues);
-		mockBoardValidatorToReturnValidationReport(validationReport);
-	}
-
-	private ValidationReport mockValidationReportToReturn(String... issues) {
-		ValidationReport validationReport= mock(ValidationReport.class);
-		boolean hasIssues = issues.length > 0;
-		when(validationReport.hasIssues()).thenReturn(hasIssues);
-		when(validationReport.getIssues()).thenReturn(Sets.newHashSet(issues));
-		return validationReport;
-	}
-
-	private void mockBoardValidatorToReturnValidationReport(ValidationReport validationReport) {
-		BoardValidator boardValidator = mock(BoardValidator.class);
-		when(boardValidator.validateBoardToBeCreated(any(Board.class))).thenReturn(validationReport);
-		target.setBoardValidator(boardValidator);
+	@Test
+	public void getFirstBoardReturnsBoardWithOldestModifiedDateAndLowestId() {
+		Optional<Board> board = target.getFirstBoard();
+		assertTrue(board.isPresent());
+		assertEquals(Long.valueOf(2L), board.get().getId());
+		
 	}
 	
+	@Test
+	public void getNextBoardTest() {
+		Optional<Board> firstBoard = target.getFirstBoard();
+		Long secondBoardId = target.getNextBoardId(firstBoard.get());
+		assertEquals(Long.valueOf(3L), secondBoardId);
+		
+		Optional<Board> secondBoard = target.findBoard(secondBoardId);
+		Long thirdBoardId = target.getNextBoardId(secondBoard.get());
+		assertEquals(Long.valueOf(1L), thirdBoardId);
+	}
 
+	@Test
+	public void getNextBoardReturnsFirstBoardWhenThereIsNoNext() {
+		Optional<Board> lastBoard = target.findBoard(1L);
+		Long nextBoardId = target.getNextBoardId(lastBoard.get());
+		assertEquals(Long.valueOf(2L), nextBoardId);
+	}
+	
 	private void assertBoardMatchesScenario(Long expectedBoardId, Optional<Board> board) {
 		assertTrue(board.isPresent());
 		assertEquals("Main Board", board.get().getName());
@@ -112,12 +111,10 @@ public class BoardServiceImplTest {
 	}
 
 	private void assertPostsMatchScenario(Optional<Board> board) {
-		Long expectedIdForFirstPost = 1L;
-		Long expectedIdForSecondPost = 2L;
 		List<Post> posts = board.get().getPosts();
 		assertEquals(2, posts.size());
-		assertEquals(expectedIdForFirstPost, posts.get(0).getId());
-		assertEquals(expectedIdForSecondPost, posts.get(1).getId());
+		assertEquals(Long.valueOf(1L), posts.get(0).getId());
+		assertEquals(Long.valueOf(2L), posts.get(1).getId());
 		assertEquals("first post content", posts.get(0).getContent());
 		assertEquals("second post content", posts.get(1).getContent());
 	}
@@ -132,5 +129,32 @@ public class BoardServiceImplTest {
 		assertTrue(boardObtainedBySearch.isPresent());
 		assertEquals(createdBoard, boardObtainedBySearch.get());
 	}
+	
+	private void assertThatCreateBoardThrowsExceptionWithExpectedMessageForIssues(String expectedMessage, String...issues) throws ValidationException {
+		this.mockBoardValidatorToReturn(issues);
+		thrown.expect(ValidationException.class);
+		thrown.expectMessage(expectedMessage);
+		target.createBoard(new Board());
+	}
+
+	private void mockBoardValidatorToReturn(String...issues) {
+		ValidationReport validationReport = mockValidationReportToReturn(issues);
+		mockBoardValidatorToReturnValidationReport(validationReport);
+	}
+	
+	private ValidationReport mockValidationReportToReturn(String... issues) {
+		ValidationReport validationReport= mock(ValidationReport.class);
+		boolean hasIssues = issues.length > 0;
+		when(validationReport.hasIssues()).thenReturn(hasIssues);
+		when(validationReport.getIssues()).thenReturn(Sets.newHashSet(issues));
+		return validationReport;
+	}
+	
+	private void mockBoardValidatorToReturnValidationReport(ValidationReport validationReport) {
+		BoardValidator boardValidator = mock(BoardValidator.class);
+		when(boardValidator.validateBoardToBeCreated(any(Board.class))).thenReturn(validationReport);
+		target.setBoardValidator(boardValidator);
+	}
 }
+
 

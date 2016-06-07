@@ -1,0 +1,24 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet id="create_last_modified_column" author="carolmoya">
+		<addColumn tableName="board">
+			<column name="last_modified" type="java.sql.Types.TIMESTAMP" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="set_lastmodified_all_boards" author="carolmoya">
+		<update tableName="board">
+			<column name="last_modified" value="2016-06-03 15:01:08" />
+		</update>
+	</changeSet>
+	
+	<changeSet id="notnullconstraint_lastmodified" author="carolmoya">
+		<addNotNullConstraint tableName="board" columnName="last_modified" />
+	</changeSet>
+	
+</databaseChangeLog>

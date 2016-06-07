@@ -1,6 +1,7 @@
 package com.aweshome.dailyboard.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -20,6 +21,7 @@ public class Board {
 	private Long id;
 	private String name;
 	private List<Post> posts = new ArrayList<Post>();
+	private Date lastModified;
 
 	@Id 
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -55,6 +57,15 @@ public class Board {
 		this.name = name;
 	}
 
+	@Column(name="last_modified")
+	public Date getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -81,7 +92,13 @@ public class Board {
 		if (!this.getPosts().equals(other.getPosts())) {
 			return false;
 		}
+		if (this.getLastModified() == null) {
+			if (other.getLastModified() != null) {
+				return false;
+			}
+		} else if (!this.getLastModified().equals(other.getLastModified())) {
+			return false;
+		} 
 		return true;
 	}
-	
 }

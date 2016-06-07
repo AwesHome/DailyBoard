@@ -10,8 +10,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import com.aweshome.dailyboard.core.BoardService;
 import com.aweshome.dailyboard.core.validation.ValidationException;
 import com.aweshome.dailyboard.model.Board;
 import com.aweshome.dailyboard.controller.BoardDTO;
-import com.aweshome.dailyboard.controller.Builder;
 import com.aweshome.dailyboard.controller.BuilderFactory;
 
 
@@ -35,49 +36,45 @@ public class BoardResource {
 	@Autowired
 	private BuilderFactory builderFactory;
 	
-	@GET
-	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getBoard(@PathParam("id") long id) {
-		Optional<Board> board = this.boardService.findBoard(id);
-		return this.buildGetBoardResponse(board);
-	}
-
+	private String path = "/Board/";
+	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createBoard(BoardDTO boardDTO) {
-		Board boardBuilt = buildBoard(boardDTO);
-		return buildCreateBoardResponse(boardBuilt);
-	}
-
-	private Response buildCreateBoardResponse(Board boardBuilt) {
+		Board boardBuilt = this.builderFactory.getBuilder(Board.class).buildEntityFrom(boardDTO);
 		try {
 			Board newBoard = this.boardService.createBoard(boardBuilt);
-			return Response.created(URI.create("/Board/" + newBoard.getId())).build();
+			return Response.created(URI.create(this.path + newBoard.getId())).build();
 		} catch (ValidationException e) {
 			return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
-
-	private Response buildGetBoardResponse(Optional<Board> board) {
-		if (board.isPresent()){
-			BoardDTO boardDTO = this.buildBoardDTO(board.get());
-			return Response.ok(boardDTO).build();
-		}
-		return Response.status(Status.NOT_FOUND).build();
-	}
-
-	private BoardDTO buildBoardDTO(Board board) {
-		Builder<Board, BoardDTO> builder = this.builderFactory.getBuilder(Board.class);
-		BoardDTO boardDTO = builder.buildDTOFrom(board);
-		return boardDTO;
+	
+	@GET
+	@Path("{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getBoard(@PathParam("id") long id, @Context UriInfo uriInfo) {
+		Optional<Board> board = this.boardService.findBoard(id);
+		return prepareResponseForGetBoard(uriInfo, board);
 	}
 	
-	private Board buildBoard(BoardDTO boardDTO) {
-		Builder<Board, BoardDTO> builder = this.builderFactory.getBuilder(Board.class);
-		Board boardBuilt = builder.buildEntityFrom(boardDTO);
-		return boardBuilt;
+	@GET
+	@Path("first")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getFirstBoard(@Context UriInfo uriInfo) {
+		Optional<Board> board = this.boardService.getFirstBoard();
+		return prepareResponseForGetBoard(uriInfo, board);
+	}
+
+	private Response prepareResponseForGetBoard(UriInfo uriInfo, Optional<Board> board) {
+		if (board.isPresent()){
+			Long nextBoardId = this.boardService.getNextBoardId(board.get());
+			BoardDTO boardDTO = (BoardDTO) this.builderFactory.getBuilder(Board.class).buildDTOFrom(board.get());
+			URI uri = uriInfo.getBaseUriBuilder().path(this.path + nextBoardId.toString()).build();
+			return Response.ok(boardDTO).link(uri, "next").build();
+		}
+		return Response.status(Status.NOT_FOUND).build();
 	}
 	
 	public void setBoardService(BoardService boardService) {
@@ -87,5 +84,4 @@ public class BoardResource {
 	public void setBuilderFactory(BuilderFactory builderFactory) {
 		this.builderFactory = builderFactory;
 	}
-	
 }
