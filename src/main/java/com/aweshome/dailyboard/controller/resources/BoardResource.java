@@ -72,7 +72,7 @@ public class BoardResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getBoard(@PathParam("id") long id, @Context UriInfo uriInfo) {
 		Optional<Board> board = this.boardService.findBoard(id);
-		return prepareResponseForGetBoard(uriInfo, board);
+		return prepareResponseToReturnBoard(uriInfo, board);
 	}
 	
 	@GET
@@ -80,10 +80,10 @@ public class BoardResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getFirstBoard(@Context UriInfo uriInfo) {
 		Optional<Board> board = this.boardService.getFirstBoard();
-		return prepareResponseForGetBoard(uriInfo, board);
+		return prepareResponseToReturnBoard(uriInfo, board);
 	}
 
-	private Response prepareResponseForGetBoard(UriInfo uriInfo, Optional<Board> board) {
+	private Response prepareResponseToReturnBoard(UriInfo uriInfo, Optional<Board> board) {
 		if (board.isPresent()){
 			Long nextBoardId = this.boardService.getNextBoardId(board.get());
 			BoardDTO boardDTO = (BoardDTO) this.builderFactory.getBuilder(Board.class).buildDTOFrom(board.get());

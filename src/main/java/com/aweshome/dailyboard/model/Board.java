@@ -46,10 +46,8 @@ public class Board {
 	}
 	
 	public void addPost(Post post) {
-		if(this.posts.size() > 0) {
-			for(Post oldPost: this.posts) {
-				if(oldPost.getContent().equals(post.getContent())) return;
-			}
+		for(Post oldPost: this.posts) {
+			if(oldPost.getContent().equals(post.getContent())) return;
 		}
 		this.posts.add(post);
 	}

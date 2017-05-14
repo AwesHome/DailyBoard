@@ -49,7 +49,7 @@ public class BoardServiceImpl implements BoardService{
 	public Post createPostForBoard(Post post, Long boardId) throws ValidationException {
         Board board = this.findBoard(boardId).get();
         ValidationReport report = new NewPostValidator().validate(post);
-        if (report.hasIssues()) throw new ValidationException(this.buildMessageForException(report.getIssues()));
+        if (report.hasIssues()) throw new ValidationException(String.join(", ", report.getIssues()));
 		board.addPost(post);
 		sessionFactory.getCurrentSession().update(board);
 		return post;
@@ -96,11 +96,6 @@ public class BoardServiceImpl implements BoardService{
 		for(Post post: board.getPosts()) {
 			report.merge(newPostValidator.validate(post));
 		}
-		if (report.hasIssues()) throw new ValidationException(this.buildMessageForException(report.getIssues()));
-	}
-
-	private String buildMessageForException(Collection<String> issues) {
-		String message = String.join(", ", issues);
-		return message;
+		if (report.hasIssues()) throw new ValidationException(String.join(", ", report.getIssues()));
 	}
 }

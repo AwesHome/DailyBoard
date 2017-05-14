@@ -33,10 +33,6 @@ public class BoardDTO {
 		return new ArrayList<PostDTO>(this.posts);
 	}
 
-	public void setPosts(List<PostDTO> posts) {
-		this.posts = posts;
-	}
-
 	public void addPost(PostDTO postDTO) {
 		this.posts.add(postDTO);
 	}

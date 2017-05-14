@@ -3,7 +3,7 @@ package com.aweshome.dailyboard.controller;
 public class PostDTO {
 	
 	private String content;
-	
+
 	public PostDTO(String content) {
 		 this.content = content;
 	}

@@ -82,7 +82,7 @@ public class BoardResourceTest {
         Post postCreated = new Post("new post content");
         Long boardId = 5L;
         when(boardService.createPostForBoard(any(Post.class), anyLong())).thenReturn(postCreated);
-	    Response response = target.createPost(boardId, new PostDTO());
+	    Response response = target.createPost(boardId, new PostDTO(""));
         assertEquals(Status.CREATED, response.getStatusInfo());
         assertEquals("/Board/" + boardId + "/Post/" + postCreated.getId(), response.getLocation().getPath());
 
@@ -93,7 +93,7 @@ public class BoardResourceTest {
         String errorMessage = "error message";
         BoardService boardService = this.resetBoardServiceMock();
         when(boardService.createPostForBoard(any(Post.class), anyLong())).thenThrow(new ValidationException(errorMessage));
-        Response response = target.createPost(9L, new PostDTO());
+        Response response = target.createPost(9L, new PostDTO(""));
         assertEquals(Status.BAD_REQUEST, response.getStatusInfo());
         assertEquals(errorMessage, response.getEntity());
     }
